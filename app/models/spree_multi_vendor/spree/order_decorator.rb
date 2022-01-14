@@ -73,11 +73,13 @@ module SpreeMultiVendor::Spree::OrderDecorator
     pre_tax_item_amount pre_tax_ship_amount pre_tax_total commission
   ].freeze
 
-#   METHOD_NAMES.each do |method_name|
-#     define_method("display_vendor_#{method_name}") do |vendor|
-#       Spree::Money.new(send("vendor_#{method_name}", vendor), { currency: currency })
-#     end
-#   end
+  METHOD_NAMES.each do |method_name|
+    define_method("display_vendor_#{method_name}") do |vendor=nil|
+      if vendor.is_a?(Spree::Vendor)
+        Spree::Money.new(send("vendor_#{method_name}", vendor), { currency: currency })
+      end
+    end
+  end
 
   def send_notification_mails_to_vendors
     vendor_ids.each do |vendor_id|
