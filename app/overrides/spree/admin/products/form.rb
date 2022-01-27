@@ -12,7 +12,7 @@ HTML
 )
 
 # disable stores field if VENDOR_ALLOW_EDIT_PRODUCT_STORES env is false
-if [false, 'false'].include?(ENV.fetch('VENDOR_ALLOW_EDIT_PRODUCT_STORES'))
+if [false, 'false'].include?(ENV.fetch('VENDOR_ALLOW_EDIT_PRODUCT_STORES', true))
   Deface::Override.new(
     virtual_path: 'spree/admin/products/_form',
     name: 'Remove stores field for vendor',
