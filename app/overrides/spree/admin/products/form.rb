@@ -8,14 +8,31 @@ Deface::Override.new(
             <%= f.text_field :price, value: number_to_currency(@product.price, unit: ''), class: 'form-control', disabled: (cannot? :update, Spree::Price) %>
             <%= f.error_message_on :price %>
           <% end %>
-        HTML
+HTML
 )
 
-Deface::Override.new(
+# disable stores field if VENDOR_ALLOW_EDIT_PRODUCT_STORES env is false
+if [false, 'false'].include?(ENV.fetch('VENDOR_ALLOW_EDIT_PRODUCT_STORES'))
+  Deface::Override.new(
     virtual_path: 'spree/admin/products/_form',
-    name: 'Enable admin to menage product vendor',
-    insert_before: 'div[data-hook="admin_product_form_taxons"]',
+    name: 'Remove stores field for vendor',
+    replace: 'div[data-hook="admin_product_form_stores"]',
     text: <<-HTML
+  <% if current_spree_user.respond_to?(:has_spree_role?) && current_spree_user.has_spree_role?(:admin) %>
+      <%= f.field_container :stores do %>
+        <%= f.label :product_stores, Spree.t(:stores) %>
+        <%= collection_select(:product, :store_ids, @stores, :id, :unique_name, {}, { multiple: true, class: 'select2' }) %>
+      <% end %>
+  <% end %>
+  HTML
+  )
+end
+
+Deface::Override.new(
+  virtual_path: 'spree/admin/products/_form',
+  name: 'Enable admin to menage product vendor',
+  insert_before: 'div[data-hook="admin_product_form_taxons"]',
+  text: <<-HTML
             <% if current_spree_user.respond_to?(:has_spree_role?) && current_spree_user.has_spree_role?(:admin) %>
               <div data-hook="admin_product_form_vendor">
                 <%= f.field_container :vendor, class: ['form-group'] do %>
@@ -25,5 +42,5 @@ Deface::Override.new(
                 <% end %>
               </div>
             <% end %>
-          HTML
+HTML
 )
