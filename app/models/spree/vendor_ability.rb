@@ -69,7 +69,7 @@ class Spree::VendorAbility
   end
 
   def apply_price_permissions
-    can :modify, Spree::Price, variant: { vendor_id: @vendor_ids }
+    can :manage, Spree::Price
   end
 
   def apply_product_option_type_permissions
